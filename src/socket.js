@@ -37,10 +37,22 @@ class Connection {
 
   getTimelines() {
     console.log("getTimelines");
+    if(synthTimeline.length > 0) {
+      this.socket.emit("synthTimeline", {
+        type: "synth",
+        data: synthTimeline,
+      });
+    }
     if(congaTimeline.length > 0) {
       this.socket.emit("congaTimeline", {
         type: "conga",
         data: congaTimeline,
+      });
+    }
+    if(drumsTimeline.length > 0) {
+      this.socket.emit("drumsTimeline", {
+        type: "drums",
+        data: drumsTimeline,
       });
     }
   }
@@ -51,6 +63,7 @@ class Connection {
         synthTimeline.push(data);
         console.log("addTimeline : synth");
         console.log(synthTimeline);
+        this.io.sockets.emit("addSynthTimeline", data);
         break;
       case "conga":
         congaTimeline.push(data);
@@ -62,6 +75,7 @@ class Connection {
         drumsTimeline.push(data);
         console.log("addTimeline : drums");
         console.log(drumsTimeline);
+        this.io.sockets.emit("addDrumsTimeline", data);
         break;
     }
   }
