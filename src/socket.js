@@ -26,17 +26,50 @@ class Connection {
     socket.on("disconnect", () => this.disconnect());
     socket.on("connect_error", (err) => {});
     socket.on("getNumberOfUsers", () => this.sendNumberOfUsers());
+    socket.on("addTimeline", (arg) => this.addTimeline(arg.type, arg.data));
+    socket.on("getTimelines", () => this.getTimelines());
   }
 
   sendNumberOfUsers() {
     console.log("send");
-    this.socket.emit("numberOfUsers", {number: numberOfUsers});
+    this.socket.emit("numberOfUsers", { number: numberOfUsers });
+  }
+
+  getTimelines() {
+    console.log("getTimelines");
+    if(congaTimeline.length > 0) {
+      this.socket.emit("congaTimeline", {
+        type: "conga",
+        data: congaTimeline,
+      });
+    }
+  }
+
+  addTimeline(type, data) {
+    switch (type) {
+      case "synth":
+        synthTimeline.push(data);
+        console.log("addTimeline : synth");
+        console.log(synthTimeline);
+        break;
+      case "conga":
+        congaTimeline.push(data);
+        console.log("addTimeline : conga");
+        console.log(congaTimeline);
+        this.io.sockets.emit("addCongaTimeline", data);
+        break;
+      case "drums":
+        drumsTimeline.push(data);
+        console.log("addTimeline : drums");
+        console.log(drumsTimeline);
+        break;
+    }
   }
 
   // Used on new client connection
-  sendNewUser(id, name) {
+  sendNewUser() {
     numberOfUsers++;
-    this.io.sockets.emit("updateNumberOfUsers", { number : numberOfUsers });
+    this.io.sockets.emit("updateNumberOfUsers", { number: numberOfUsers });
   }
 
   // Used on new client disconnection
